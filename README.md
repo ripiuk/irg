@@ -12,12 +12,15 @@ Additionally on windows you can convert photos by simply dragging supported file
 The output files will be saved in the same location as the input. The filename will be prepended with `out-`
 
 # Example
-Input
+Input:
+
 ![demo](./docs/demo.jpg)
 
-Output
+Output:
+
 ![demo](./docs/out-demo.jpg)
 
-Whitebalanced in photoshop
+Whitebalanced in photoshop:
+
 ![demo](./docs/out-demo-balanced.jpg)
 
