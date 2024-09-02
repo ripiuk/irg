@@ -7,12 +7,41 @@ This package processes images captured on full spectrum camera with yellow filte
 # Setup
 Install python from https://www.python.org/downloads/
 
+Create a virtualenv inside the project folder:
+
+```shell
+$ cd irg
+$ python3 -m venv .venv
+```
+
+Now, activate the corresponding environment. On OS X and Linux, do the following:
+
+```shell
+$ . .venv/bin/activate
+(venv) $
+```
+
+If you are a Windows user, the following command is for you:
+
+```shell
+> .venv\scripts\activate
+(venv) >
+```
+
+And if you want to stop using the virtualenv, use the following command:
+
+```shell
+$ deactivate
+```
+
+Enter the following command to get all the dependencies installed in your virtualenv:
+
+```shell
+$ pip install -r requirements.txt
+```
+
 # How to use
-You can use this script from the command line `python irg.py demo.jpg`
-
-Additionally on windows you can convert photos by simply dragging supported file(s) onto `irg.py` in your file explorer
-
-The output files will be saved in the same location as the input. The filename will be prepended with `out-`
+You can use this script from the command line `python irg.py docs/demo.jpg`
 
 # Example
 Input:

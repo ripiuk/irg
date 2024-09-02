@@ -1,44 +1,60 @@
-import subprocess
-import sys
+from pathlib import Path
 
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-
-print("installing dependancies")
-install("opencv-python")
-install("numpy")
-
-import numpy as np
 import cv2
-import math
-import sys
-import os
-
-def loadimg(name):
-    return cv2.imread(name, cv2.IMREAD_UNCHANGED)
-
-def processFile(path):
-    print("processing " + path)
-    #convert images to signed double (int16)
-    inputFile=loadimg(path)
-    ir = inputFile[:,:,0]
-    green = inputFile[:,:,1]
-    red = inputFile[:,:,2]
-
-    irMat = np.float32(ir)
-
-    gMat = np.float32(green)
-    gMat = cv2.subtract(gMat,irMat*.8)
+import click
+import numpy as np
 
 
-    rMat = np.float32(red)
-    rMat = cv2.subtract(rMat,irMat+.65)
-   
-    output = cv2.normalize(cv2.merge((gMat, rMat, irMat*.6)), None, 255, 0, cv2.NORM_MINMAX, cv2.CV_8UC1)
+def convert_image(file_path: Path) -> Path:
+    click.echo(f'Processing {file_path}')
+    input_file = cv2.imread(str(file_path), cv2.IMREAD_UNCHANGED)  # convert images to signed double
+    ir = input_file[:, :, 0]
+    green = input_file[:, :, 1]
+    red = input_file[:, :, 2]
 
-    path = os.path.split(path)
+    ir_mat = np.float32(ir)
 
-    cv2.imwrite(os.path.join(path[0], "out-"+path[1]), output)
+    g_mat = np.float32(green)
+    g_mat = cv2.subtract(g_mat, ir_mat * .8)
 
-for i in range (1, len(sys.argv)):
-    processFile(sys.argv[i])
+    r_mat = np.float32(red)
+    r_mat = cv2.subtract(r_mat, ir_mat + .65)
+
+    output = cv2.normalize(
+        cv2.merge((g_mat, r_mat, ir_mat * .6)),
+        dst=None,
+        alpha=255,
+        beta=0,
+        norm_type=cv2.NORM_MINMAX,
+        dtype=cv2.CV_8UC1,
+    )
+
+    new_file_path = file_path.with_name(f'converted_{file_path.name}')
+    is_converted = cv2.imwrite(str(new_file_path), output)
+    if not is_converted:
+        raise FileNotFoundError(f'Could not convert image {file_path}')
+
+    click.echo(click.style(f'Successfully converted image: {new_file_path}\n', fg='green'))
+    return new_file_path
+
+
+def process_files(file_path: Path) -> None:
+    if file_path.is_dir():
+        for file in file_path.iterdir():
+            process_files(file)
+
+    if file_path.is_file():
+        convert_image(file_path)
+    else:
+        click.echo(click.style(f'The {file_path} will be skipped, because it is not a file.', fg='red'))
+
+
+@click.command()
+@click.argument('files', nargs=-1, type=click.Path(exists=True))
+def cli(files: tuple[str, ...]) -> None:
+    for file in files:
+        process_files(Path(file))
+
+
+if __name__ == '__main__':
+    cli()

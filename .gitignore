@@ -1,0 +1,11 @@
+### compiled files ###
+__pycache__/
+*.pyc
+
+### ide files ###
+.idea/
+/.vscode
+
+### virtualenv ###
+env/
+venv/
